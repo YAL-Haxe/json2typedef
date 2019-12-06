@@ -1,0 +1,30 @@
+{
+	"aString": "hi!",
+	"anInt": 4,
+	"aFloat": 0.5,
+	"aBool": true,
+	"anObject": { "a":1, "b":true },
+	
+	"ofMystery": [],
+	
+	"ofBool": [true, false],
+	"ofNullBool": [true, null, false],
+	"ofNullBool1": [null, true, false],
+	
+	"ofInt": [1, 2, 3],
+	"ofFloat": [0.1, 0.2, 0.3],
+	"ofNumber": [1, 1.5, 2],
+	"ofNullInt": [1, null, 2],
+	"ofNullInt1": [null, 1, 2],
+	
+	"ofIntOrBool": [1, true],
+	"ofNullIntOrBool": [1, null, true],
+	"ofNullIntOrBool1": [null, 1, true],
+	
+	"ofIntOrString": [1, "hi"],
+	"ofNullIntOrString": [null, 1, "hi"],
+	
+	"ofOptField": [{"a":1,"b":true}, {"a":2}],
+	
+	"bye": null
+}

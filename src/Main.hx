@@ -1,5 +1,6 @@
 package;
 
+import haxe.Http;
 import js.Browser;
 import js.Lib;
 import js.html.Element;
@@ -36,6 +37,14 @@ class Main {
 		for (el in [useVar, tabSize, allFloat]) {
 			el.onchange = function(_) { proc(); return false; }
 		}
+		#if (debug && js)
+		var req = new Http("test.json");
+		req.onData = function(s:String) {
+			input.value = s;
+			proc();
+		}
+		req.request();
+		#end
 	}
 	
 }

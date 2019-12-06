@@ -22,7 +22,9 @@ class TdPrinter {
 				var r = "{";
 				var sep = false;
 				for (fd in d.fieldList) {
-					if (sep) r += ","; else sep = true;
+					if (sep) {
+						r += useVar ? ";" : ",";
+					} else sep = true;
 					r += "\n";
 					for (_ in 0 ... ni) r += "\t";
 					if (d.fieldOpt[fd]) r += "?";
@@ -30,6 +32,7 @@ class TdPrinter {
 					r += fd + ":" + rec(d.fieldTypes[fd], ni);
 				}
 				if (sep) {
+					if (useVar) r += ";";
 					r += "\n";
 					for (_ in 0 ... indent) r += "\t";
 				}

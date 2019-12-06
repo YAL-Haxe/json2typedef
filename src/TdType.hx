@@ -8,9 +8,9 @@ enum TdType {
 	TdNull;
 	TdInt;
 	TdFloat;
-	TdString;
 	TdBool;
 	TdOpt(t:TdType); // Null<T>, for Bool|Int|Float
+	TdString;
 	TdArray(t:TdType);
 	TdObject(d:TdObjectData);
 	TdEither(a:TdType, b:TdType);
