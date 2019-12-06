@@ -15,7 +15,7 @@ class TdPrinter {
 			case TdFloat: "Float";
 			case TdBool: "Bool";
 			case TdString: "String";
-			case TdOpt(t): "?" + rec(t, indent);
+			case TdOpt(t): "Null<" + rec(t, indent) + ">";
 			case TdArray(t): "Array<" + rec(t, indent) + ">";
 			case TdObject(d): {
 				var ni = indent + 1;
@@ -35,7 +35,7 @@ class TdPrinter {
 				}
 				r + "}";
 			};
-			default: "" + type;
+			case TdEither(a, b): "EitherType<" + rec(a, indent) + ", " + rec(b, indent) + ">";
 		}
 	}
 	public static function print(type:TdType, opt:TdPrinterOptions) {
