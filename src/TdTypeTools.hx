@@ -16,6 +16,7 @@ class TdTypeTools {
 			case [TdFloat, TdFloat]: true;
 			case [TdBool, TdBool]: true;
 			case [TdString, TdString]: true;
+			case [TdGUID, TdGUID]: true;
 			case [TdOpt(pa), TdOpt(pb)]: equals(pa, pb);
 			case [TdArray(pa), TdArray(pb)]: equals(pa, pb);
 			case [TdObject(ad), TdObject(bd)]: {
@@ -68,10 +69,10 @@ class TdTypeTools {
 			case [TdOpt(TdInt), t = TdOpt(TdFloat)], [t = TdOpt(TdFloat), TdOpt(TdInt)]: t;
 			
 			// already nullable
-			case [TdNull, t = TdString | TdOpt(_) | TdArray(_) | TdObject(_)]: t;
+			case [TdNull, t = TdString | TdGUID | TdOpt(_) | TdArray(_) | TdObject(_)]: t;
 			
 			// [?number, object] -> either<number, object>
-			case [TdOpt(t), TdString | TdArray(_) | TdObject(_)]: {
+			case [TdOpt(t), TdString | TdGUID | TdArray(_) | TdObject(_)]: {
 				TdEither(t, b);
 			};
 			
@@ -82,6 +83,8 @@ class TdTypeTools {
 			};
 			
 			case [TdArray(ap), TdArray(bp)]: TdArray(unify(ap, bp));
+			
+			case [TdGUID, TdString], [TdString, TdGUID]: TdString;
 			
 			case [TdObject(ad), TdObject(bd)]: {
 				var rd = new TdObjectData();

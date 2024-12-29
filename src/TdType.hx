@@ -11,6 +11,7 @@ enum TdType {
 	TdBool;
 	TdOpt(t:TdType); // Null<T>, for Bool|Int|Float
 	TdString;
+	TdGUID;
 	TdArray(t:TdType);
 	TdObject(d:TdObjectData);
 	TdEither(a:TdType, b:TdType);

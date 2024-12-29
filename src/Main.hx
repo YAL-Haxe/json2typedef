@@ -21,6 +21,7 @@ class Main {
 		var useVar:InputElement = find("usevar");
 		var tabSize:InputElement = find("tabsize");
 		var allFloat:InputElement = find("allfloat");
+		var isYY:InputElement = find("as-yy");
 		function proc() {
 			try {
 				var t = TdParser.parse(input.value);
@@ -28,6 +29,7 @@ class Main {
 					useVar: useVar.checked,
 					allFloat: allFloat.checked,
 					indentSize: Std.parseInt(tabSize.value),
+					isYY: isYY.checked,
 				});
 			} catch (x:Dynamic) {
 				output.value = x;

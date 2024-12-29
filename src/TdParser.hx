@@ -10,6 +10,24 @@ class TdParser {
 	static public inline function parse(str : String) : TdType {
 		return new TdParser(str).doParse();
 	}
+	
+	#if js
+	static var rxGUID = {
+		var h = '[0-9a-fA-F]';
+		new js.lib.RegExp('^$h{8}-$h{4}-$h{4}-$h{4}-$h{12}' + "$");
+	}
+	static inline function isGUID(s:String) {
+		return rxGUID.test(s);
+	}
+	#else
+	static var rxGUID = {
+		var h = '[0-9a-fA-F]';
+		new EReg('^$h{8}-$h{4}-$h{4}-$h{4}-$h{12}' + "$");
+	};
+	static inline function isGUID(s:String) {
+		return rxGUID.match(s);
+	}
+	#end
 
 	var str : String;
 	var pos : Int;
@@ -26,12 +44,15 @@ class TdParser {
 		indent = 0;
 		var result = parseRec();
 		var c;
+		var oneComma = true;
 		while( !StringTools.isEof(c = nextChar()) ) {
 			switch( c ) {
 				case ' '.code, '\r'.code, '\n'.code, '\t'.code:
 					// allow trailing whitespace
+				case ",".code if (oneComma):
+					oneComma = false;
 				default:
-					invalidChar();
+					invalidChar("trailing data");
 			}
 		}
 		return result;
@@ -56,17 +77,17 @@ class TdParser {
 						return TdObject(rd);
 					case ':'.code:
 						if( field == null )
-							invalidChar();
+							invalidChar("object: expected field");
 						rd.set(field, parseRec());
 						field = null;
 						comma = true;
 					case ','.code:
-						if( comma ) comma = false else invalidChar();
+						if( comma ) comma = false else invalidChar("object: extra comma");
 					case '"'.code:
-						if( field != null || comma ) invalidChar();
+						if( field != null || comma ) invalidChar("object: double key?");
 						field = parseString();
 					default:
-						invalidChar();
+						invalidChar("object (field:" + field + ", comma:" + comma + ")");
 					}
 				}
 			case '['.code:
@@ -81,9 +102,9 @@ class TdParser {
 						// if( comma == false ) invalidChar(); // +y: allowed
 						return TdArray(result);
 					case ','.code:
-						if( comma ) comma = false else invalidChar();
+						if( comma ) comma = false else invalidChar("array: extra comma");
 					default:
-						if( comma ) invalidChar();
+						if( comma ) invalidChar("array: want comma");
 						pos--;
 						result = TdTypeTools.unify(result, parseRec());
 						comma = true;
@@ -93,30 +114,30 @@ class TdParser {
 				var save = pos;
 				if( nextChar() != 'r'.code || nextChar() != 'u'.code || nextChar() != 'e'.code ) {
 					pos = save;
-					invalidChar();
+					invalidChar("ident: not true!");
 				}
 				return TdBool;
 			case 'f'.code:
 				var save = pos;
 				if( nextChar() != 'a'.code || nextChar() != 'l'.code || nextChar() != 's'.code || nextChar() != 'e'.code ) {
 					pos = save;
-					invalidChar();
+					invalidChar("ident: not false!");
 				}
 				return TdBool;
 			case 'n'.code:
 				var save = pos;
 				if( nextChar() != 'u'.code || nextChar() != 'l'.code || nextChar() != 'l'.code ) {
 					pos = save;
-					invalidChar();
+					invalidChar("ident: not null!");
 				}
 				return TdNull;
 			case '"'.code:
-				parseString();
-				return TdString;
+				var s = parseString();
+				return isGUID(s) ? TdGUID : TdString;
 			case '0'.code, '1'.code,'2'.code,'3'.code,'4'.code,'5'.code,'6'.code,'7'.code,'8'.code,'9'.code,'-'.code:
 				return parseNumber(c);
 			default:
-				invalidChar();
+				invalidChar("value?");
 			}
 		}
 	}
@@ -256,9 +277,9 @@ class TdParser {
 		return StringTools.fastCodeAt(str,pos++);
 	}
 
-	function invalidChar() {
+	function invalidChar(ctx:String) {
 		pos--; // rewind
-		throw "Invalid char "+StringTools.fastCodeAt(str,pos)+" at position "+pos;
+		throw "Invalid char "+StringTools.fastCodeAt(str,pos)+" at position "+pos+", "+ctx;
 	}
 
 	function invalidNumber( start : Int ) {
